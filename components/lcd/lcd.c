@@ -199,7 +199,7 @@ int lcd_init(void)
         .sclk_io_num = PIN_NUM_CLK,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
-        .max_transfer_sz = 50 * EXAMPLE_LCD_H_RES * 2 + 8
+        .max_transfer_sz = 320 * EXAMPLE_LCD_H_RES * 2 + 8
     };
 
     esp_lcd_panel_io_spi_config_t io_config = {
@@ -240,13 +240,14 @@ int lcd_init(void)
 
 	esp_lcd_panel_mirror(panel_handle, 0, 1);
 
-    gui = gui_create(EXAMPLE_LCD_H_RES, EXAMPLE_LCD_V_RES);
-    if (gui == NULL) {
-        printf("gui create failed\n");
-        return -1;
-    }
+    // gui = gui_create(EXAMPLE_LCD_H_RES, EXAMPLE_LCD_V_RES);
+    // if (gui == NULL) {
+    //     printf("gui create failed\n");
+    //     return -1;
+    // }
 
-    gui->gui_start(lcd_flush, GUI_WHITE, GUI_BLACK);
+    // gui->gui_start(lcd_flush, GUI_WHITE, GUI_BLACK);
+
     // ret = pthread_create(&tid, &attr, gui_loop, NULL);
     // if (ret) {
     //     printf("led thread create failed\n");

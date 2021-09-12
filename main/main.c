@@ -80,9 +80,7 @@ static void my_lcd_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, 
         return;
     }
 
-    // printf("(%d, %d), (%d, %d)\n", area->x1, area->y1, area->x2, area->y2);
     lcd_flush(area->x1, area->y1, area->x2 + 1, area->y2 + 1, (uint16_t *)color_p);
-    // vTaskDelay(pdMS_TO_TICKS(2000));
     lv_disp_flush_ready(disp_drv);
 }
 
