@@ -51,7 +51,7 @@ static esp_lcd_panel_io_handle_t io_handle = NULL;
 static uint16_t *s_lines = NULL;
 static uint16_t **pixels = NULL;
 
-static esp_err_t lcd_flush(uint16_t xs, uint16_t ys, uint16_t xe, uint16_t ye, uint16_t *data)
+esp_err_t lcd_flush(uint16_t xs, uint16_t ys, uint16_t xe, uint16_t ye, uint16_t *data)
 {
     if (panel_handle == NULL || data == NULL) {
 		return ESP_FAIL;
@@ -199,7 +199,7 @@ int lcd_init(void)
         .sclk_io_num = PIN_NUM_CLK,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
-        .max_transfer_sz = PARALLEL_LINES * EXAMPLE_LCD_H_RES * 2 + 8
+        .max_transfer_sz = 50 * EXAMPLE_LCD_H_RES * 2 + 8
     };
 
     esp_lcd_panel_io_spi_config_t io_config = {
