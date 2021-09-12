@@ -28,6 +28,7 @@
 #endif
 
 #include "lvgl_helpers.h"
+#include "lcd.h"
 
 #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
     #if defined CONFIG_LV_USE_DEMO_WIDGETS
@@ -72,6 +73,19 @@ void app_main() {
  * you should lock on the very same semaphore! */
 SemaphoreHandle_t xGuiSemaphore;
 
+static void my_lcd_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+{
+    if (area == NULL || color_p == NULL) {
+        printf("input null\n");
+        return;
+    }
+
+    // printf("(%d, %d), (%d, %d)\n", area->x1, area->y1, area->x2, area->y2);
+    my_lcd_draw_bitmap(area->x1, area->y1, area->x2 + 1, area->y2 + 1, (uint16_t *)color_p);
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    lv_disp_flush_ready(disp_drv);
+}
+
 static void guiTask(void *pvParameter) {
 
     (void) pvParameter;
@@ -80,7 +94,8 @@ static void guiTask(void *pvParameter) {
     lv_init();
 
     /* Initialize SPI or I2C bus used by the drivers */
-    lvgl_driver_init();
+    // lvgl_driver_init();
+    lcd_init();
 
     lv_color_t* buf1 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
     assert(buf1 != NULL);
@@ -112,7 +127,8 @@ static void guiTask(void *pvParameter) {
 
     lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
-    disp_drv.flush_cb = disp_driver_flush;
+    disp_drv.flush_cb = my_lcd_flush;
+    // disp_drv.flush_cb = disp_driver_flush;
 
     /* When using a monochrome display we need to register the callbacks:
      * - rounder_cb
