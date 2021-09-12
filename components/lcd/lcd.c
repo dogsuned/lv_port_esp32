@@ -57,7 +57,12 @@ static esp_err_t lcd_flush(uint16_t xs, uint16_t ys, uint16_t xe, uint16_t ye, u
 		return ESP_FAIL;
 	}
 
-    return esp_lcd_panel_draw_bitmap(panel_handle, xs, ys, xe, ye, data);
+    if (esp_lcd_panel_draw_bitmap(panel_handle, xs, ys, xe, ye, data)) {
+        printf("lcd draw bitmap failed\n");
+        return ESP_FAIL;
+    }
+
+    return esp_lcd_panel_write_reg(panel_handle, 0x2c, NULL, 0);
 }
 
 static esp_err_t lcd_draw_bitmap(uint16_t x_s, uint16_t y_s, uint16_t x_e, uint16_t y_e)
