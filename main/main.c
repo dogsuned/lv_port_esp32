@@ -19,6 +19,8 @@
 #include "freertos/semphr.h"
 #include "esp_system.h"
 #include "driver/gpio.h"
+#include "nvs_flash.h"
+#include "app_console.h"
 
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -61,6 +63,13 @@ static void create_demo_application(void);
  *   APPLICATION MAIN
  **********************/
 void app_main() {
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK) {
+        ESP_ERROR_CHECK( nvs_flash_erase() );
+        ESP_ERROR_CHECK( nvs_flash_init() );
+    }
+
+    app_console_init();
 
     /* If you want to use a task to create the graphic, you NEED to create a Pinned task
      * Otherwise there can be problem such as memory corruption and so on.
