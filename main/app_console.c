@@ -6,6 +6,8 @@
 #include "argtable3/argtable3.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "app_net.h"
+#include "esp_log.h"
 
 static esp_console_repl_t *s_repl = NULL;
 
@@ -21,8 +23,20 @@ static int cmd_test(int argc, char **argv)
     return 0;
 }
 
+static int cmd_wifi_config(int argc, char **argv)
+{
+    if (argc < 3) {
+        ESP_LOGE("cmd", "input args num: %d\n", argc);
+        return -1;
+    }
+
+    app_net_start((unsigned char *)argv[1], (unsigned char *)argv[2]);
+    return 0;
+}
+
 static esp_console_cmd_t usr_cmd[] = {
     {"test",        "This is test cmd",         NULL,   cmd_test,           NULL},
+    {"wifi",        "wifi connect",             NULL,   cmd_wifi_config,    NULL},
 };
 
 int app_console_init(void)
