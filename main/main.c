@@ -21,6 +21,7 @@
 #include "driver/gpio.h"
 #include "nvs_flash.h"
 #include "app_console.h"
+#include "app_iot.h"
 
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE

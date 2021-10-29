@@ -2,12 +2,20 @@
 #include <string.h>
 #include "sdkconfig.h"
 #include "unity.h"
-#include "esp_console.h"
 #include "argtable3/argtable3.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "app_net.h"
 #include "esp_log.h"
+#include "app_console.h"
+#include "app_iot.h"
+
+static const char* TAG = "console";
+
+typedef struct {
+    const char *cmd;
+    esp_console_cmd_func_t func;
+} console_cmd_t;
 
 static esp_console_repl_t *s_repl = NULL;
 
@@ -34,10 +42,37 @@ static int cmd_wifi_config(int argc, char **argv)
     return 0;
 }
 
-static esp_console_cmd_t usr_cmd[] = {
-    {"test",        "This is test cmd",         NULL,   cmd_test,           NULL},
-    {"wifi",        "wifi connect",             NULL,   cmd_wifi_config,    NULL},
+static int cmd_mqtt_start(int argc, char **argv)
+{
+    app_iot_start();
+    return 0;
+}
+
+static console_cmd_t usr_cmd[] = {
+    {"test",    cmd_test},
+    {"wifi",    cmd_wifi_config},
+    {"mqtt",    cmd_mqtt_start},
 };
+
+esp_err_t app_console_cmd_register(const char *cmd, esp_console_cmd_func_t cmd_func)
+{
+    esp_console_cmd_t cmd_config;
+    esp_err_t retval;
+
+    if (cmd == NULL || cmd_func == NULL) {
+        ESP_LOGE(TAG, "invalid args\n");
+        return -1;
+    }
+
+    memset(&cmd_config, 0, sizeof(esp_console_cmd_t));
+    cmd_config.command = cmd;
+    cmd_config.func = cmd_func;
+
+    retval = esp_console_cmd_register(&cmd_config);
+    ESP_LOGI(TAG, "console cmd: %s register %s\n", cmd, retval ? "failed" : "success");
+
+    return retval;
+}
 
 int app_console_init(void)
 {
@@ -61,21 +96,21 @@ int app_console_init(void)
 
     ret = esp_console_new_repl_uart(&uart_config, &repl_config, &s_repl);
     if (ret) {
-        printf("console init failed\n");
+        ESP_LOGE(TAG, "console init failed\n");
         return -1;
     }
 
-    for (i = 0; i < sizeof(usr_cmd) / sizeof(esp_console_cmd_t); i++) {
-        printf("cmd[ %s ] register %s\n", usr_cmd[i].command, esp_console_cmd_register(&usr_cmd[i]) ? "failed" : "success");
+    for (i = 0; i < sizeof(usr_cmd) / sizeof(console_cmd_t); i++) {
+        app_console_cmd_register(usr_cmd[i].cmd, usr_cmd[i].func);
     }
 
     ret = esp_console_start_repl(s_repl);
     if (ret) {
-        printf("failed start repl\n");
+        ESP_LOGE(TAG, "failed start repl\n");
         return -1;
     }
 
-    printf("console init success\n");
+    ESP_LOGI(TAG, "console init success\n");
     return 0;
 }
 
