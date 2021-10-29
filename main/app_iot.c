@@ -146,9 +146,13 @@ int mqtt_main(void *paras)
     int                     loop_cnt = 0;
     iotx_mqtt_param_t       mqtt_params;
 
-    HAL_GetProductKey(DEMO_PRODUCT_KEY);
-    HAL_GetDeviceName(DEMO_DEVICE_NAME);
-    HAL_GetDeviceSecret(DEMO_DEVICE_SECRET);
+    // HAL_GetProductKey(DEMO_PRODUCT_KEY);
+    // HAL_GetDeviceName(DEMO_DEVICE_NAME);
+    // HAL_GetDeviceSecret(DEMO_DEVICE_SECRET);
+
+    strcpy(DEMO_PRODUCT_KEY, "a10pxa9mF2g");
+    strcpy(DEMO_DEVICE_NAME, "esp_mqtt_device");
+    strcpy(DEMO_DEVICE_SECRET, "ca92ce281d927f3109aed683d53d4f9d");
 
     EXAMPLE_TRACE("mqtt example");
 
@@ -284,11 +288,7 @@ void app_iot_start(void)
     }
 
     mqtt_started = true;
-    conn_mgr_init();
-
     xTaskCreate((void (*)(void *))mqtt_main, "mqtt_example", 10240, NULL, 5, NULL);
     IOT_SetLogLevel(IOT_LOG_INFO);
-
-    conn_mgr_start();
 }
 
