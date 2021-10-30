@@ -125,12 +125,12 @@ CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
 #
 # Partition Table
 #
-CONFIG_PARTITION_TABLE_SINGLE_APP=y
+# CONFIG_PARTITION_TABLE_SINGLE_APP is not set
 # CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE is not set
 # CONFIG_PARTITION_TABLE_TWO_OTA is not set
-# CONFIG_PARTITION_TABLE_CUSTOM is not set
+CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
-CONFIG_PARTITION_TABLE_FILENAME="partitions_singleapp.csv"
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
 CONFIG_PARTITION_TABLE_OFFSET=0x8000
 CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
@@ -279,6 +279,71 @@ CONFIG_EFUSE_CODE_SCHEME_COMPAT_3_4=y
 # CONFIG_EFUSE_CODE_SCHEME_COMPAT_REPEAT is not set
 CONFIG_EFUSE_MAX_BLK_LEN=192
 # end of eFuse Bit Manager
+
+#
+# iotkit embedded
+#
+
+#
+# Aliyun linkkit device version
+#
+CONFIG_LINKKIT_FIRMWARE_VERSION="0.0.1"
+# end of Aliyun linkkit device version
+
+#
+# Aliyun linkkit awss config
+#
+CONFIG_AWSS_ENCRYPT_TYPE=3
+CONFIG_AWSS_CONN_ENCRYPT_TYPE=4
+CONFIG_AWSS_TIMEOUT_INTERVAL_MS=180000
+CONFIG_AWSS_CHANNELSCAN_INTERVAL_MS=200
+# end of Aliyun linkkit awss config
+
+#
+# Aliyun linkkit network config
+#
+# CONFIG_SUPPORT_TCP is not set
+CONFIG_TCP_ESTABLISH_TIMEOUT_MS=10000
+CONFIG_TLS_ESTABLISH_TIMEOUT_MS=10000
+# end of Aliyun linkkit network config
+
+#
+# Aliyun linkkit device model config
+#
+# CONFIG_DEVICE_MODEL_GATEWAY is not set
+# end of Aliyun linkkit device model config
+
+#
+# Aliyun linkkit local control
+#
+# CONFIG_DEVICE_ALCS_ENABLE is not set
+# end of Aliyun linkkit local control
+
+#
+# Aliyun linkkit security OTA
+#
+# CONFIG_SUPPORT_SECURITY_OTA is not set
+# end of Aliyun linkkit security OTA
+
+#
+# Aliyun linkkit dynamic register
+#
+CONFIG_DYNAMIC_REGISTER=y
+# end of Aliyun linkkit dynamic register
+
+#
+# Aliyun linkkit mqtt config
+#
+CONFIG_MQTT_DIRECT=y
+# end of Aliyun linkkit mqtt config
+
+CONFIG_HAL_SEM_MAX_COUNT=255
+CONFIG_HAL_SEM_INIT_COUNT=0
+CONFIG_HAL_TLS_HANDSHAKE_TIMEOUT=180
+# CONFIG_HAL_USE_CUSTOMER_AP_SSID is not set
+CONFIG_AP_SSID_KEY="apssid"
+# CONFIG_USE_SOFTAP_CONFIG is not set
+# end of iotkit embedded
 
 #
 # ESP-TLS
@@ -1162,7 +1227,7 @@ CONFIG_LV_TFT_DISPLAY_USER_CONTROLLER_ST7789=y
 # CONFIG_LV_TFT_DISPLAY_USER_CONTROLLER_UC8151D is not set
 # CONFIG_LV_TFT_DISPLAY_USER_CONTROLLER_RA8875 is not set
 CONFIG_CUSTOM_DISPLAY_BUFFER_SIZE=y
-CONFIG_CUSTOM_DISPLAY_BUFFER_BYTES=76800
+CONFIG_CUSTOM_DISPLAY_BUFFER_BYTES=7200
 CONFIG_LV_TFT_DISPLAY_SPI_HSPI=y
 # CONFIG_LV_TFT_DISPLAY_SPI_VSPI is not set
 CONFIG_LV_TFT_DISPLAY_SPI_TRANS_MODE_SIO=y
