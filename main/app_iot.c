@@ -34,6 +34,7 @@
 #include "conn_mgr.h"
 #include "mqtt_api.h"
 #include "dm_wrapper.h"
+#include "cJSON.h"
 
 static const char* TAG = "iot";
 static bool mqtt_started = false;
@@ -93,13 +94,43 @@ int example_subscribe(void *handle)
     return 0;
 }
 
+static int construct_msg_payload(char *payload)
+{
+    cJSON *root;
+    int running_state = 1;
+    static int count = 0;
+    char *buffer = NULL;
+
+    if (payload == NULL) {
+        HAL_Printf("payload null\n");
+        return -1;
+    }
+
+    root = cJSON_CreateObject();
+    if (root == NULL) {
+        HAL_Printf("failed create root\n");
+        return -1;
+    }
+
+    cJSON_AddNumberToObject(root, "RunningState", running_state);
+    cJSON_AddStringToObject(root, "log", "esp32 mqtt");
+    cJSON_AddNumberToObject(root, "count", ++count);
+    buffer = cJSON_Print(root);
+    if (buffer) {
+        strcpy(payload, buffer);
+        free(buffer);
+    }
+    cJSON_Delete(root);
+    return 0;
+}
+
 int example_publish(void *handle)
 {
     int             res = 0;
-    const char     *fmt = "/%s/%s/user/get";
+    const char     *fmt = "/sys/%s/%s/thing/event/property/post";
     char           *topic = NULL;
     int             topic_len = 0;
-    char           *payload = "{\"message\":\"hello!\"}";
+    char            payload[128];
 
     topic_len = strlen(fmt) + strlen(DEMO_PRODUCT_KEY) + strlen(DEMO_DEVICE_NAME) + 1;
     topic = HAL_Malloc(topic_len);
@@ -110,6 +141,8 @@ int example_publish(void *handle)
     memset(topic, 0, topic_len);
     HAL_Snprintf(topic, topic_len, fmt, DEMO_PRODUCT_KEY, DEMO_DEVICE_NAME);
 
+    memset(payload, 0, sizeof(payload));
+    construct_msg_payload(payload);
     res = IOT_MQTT_Publish_Simple(0, topic, IOTX_MQTT_QOS0, payload, strlen(payload));
     if (res < 0) {
         EXAMPLE_TRACE("publish failed, res = %d", res);
