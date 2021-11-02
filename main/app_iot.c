@@ -35,6 +35,7 @@
 #include "mqtt_api.h"
 #include "dm_wrapper.h"
 #include "cJSON.h"
+#include "app_console.h"
 
 static const char* TAG = "iot";
 static bool mqtt_started = false;
@@ -96,7 +97,7 @@ int example_subscribe(void *handle)
 
 static int construct_msg_payload(char *payload)
 {
-    cJSON *root;
+    cJSON *root, *item;
     int running_state = 1;
     static int count = 0;
     char *buffer = NULL;
@@ -112,9 +113,17 @@ static int construct_msg_payload(char *payload)
         return -1;
     }
 
-    cJSON_AddNumberToObject(root, "RunningState", running_state);
-    cJSON_AddStringToObject(root, "log", "esp32 mqtt");
-    cJSON_AddNumberToObject(root, "count", ++count);
+    item = cJSON_CreateObject();
+    if (item == NULL) {
+        HAL_Printf("failed create item\n");
+        cJSON_Delete(root);
+        return -1;
+    }
+
+    cJSON_AddNumberToObject(item, "RunningState", running_state);
+    cJSON_AddStringToObject(item, "log", console_get_string());
+    cJSON_AddNumberToObject(item, "count", ++count);
+    cJSON_AddItemToObject(root, "params", item);
     buffer = cJSON_Print(root);
     if (buffer) {
         strcpy(payload, buffer);
@@ -143,6 +152,7 @@ int example_publish(void *handle)
 
     memset(payload, 0, sizeof(payload));
     construct_msg_payload(payload);
+    HAL_Printf("payload: %s\n", payload);
     res = IOT_MQTT_Publish_Simple(0, topic, IOTX_MQTT_QOS0, payload, strlen(payload));
     if (res < 0) {
         EXAMPLE_TRACE("publish failed, res = %d", res);
@@ -179,13 +189,14 @@ int mqtt_main(void *paras)
     int                     loop_cnt = 0;
     iotx_mqtt_param_t       mqtt_params;
 
-    // HAL_GetProductKey(DEMO_PRODUCT_KEY);
-    // HAL_GetDeviceName(DEMO_DEVICE_NAME);
-    // HAL_GetDeviceSecret(DEMO_DEVICE_SECRET);
+    HAL_SetDeviceName("esp_mqtt_device");
+    HAL_SetDeviceSecret("ca92ce281d927f3109aed683d53d4f9d");
+    HAL_SetProductKey("a10pxa9mF2g");
+    HAL_SetProductSecret("apELnwLNQBghQPuH");
 
-    strcpy(DEMO_PRODUCT_KEY, "a10pxa9mF2g");
-    strcpy(DEMO_DEVICE_NAME, "esp_mqtt_device");
-    strcpy(DEMO_DEVICE_SECRET, "ca92ce281d927f3109aed683d53d4f9d");
+    HAL_GetProductKey(DEMO_PRODUCT_KEY);
+    HAL_GetDeviceName(DEMO_DEVICE_NAME);
+    HAL_GetDeviceSecret(DEMO_DEVICE_SECRET);
 
     EXAMPLE_TRACE("mqtt example");
 
@@ -301,7 +312,7 @@ int mqtt_main(void *paras)
     }
 
     while (1) {
-        if (0 == loop_cnt % 20) {
+        if (0 == loop_cnt % 50) {
             example_publish(pclient);
         }
 
@@ -313,6 +324,7 @@ int mqtt_main(void *paras)
     return 0;
 }
 
+#if 1
 void app_iot_start(void)
 {
     if (mqtt_started) {
@@ -324,4 +336,35 @@ void app_iot_start(void)
     xTaskCreate((void (*)(void *))mqtt_main, "mqtt_example", 10240, NULL, 5, NULL);
     IOT_SetLogLevel(IOT_LOG_INFO);
 }
+#else
+static esp_err_t wifi_event_handle(void *ctx, system_event_t *event)
+{
+    switch (event->event_id) {
+        case SYSTEM_EVENT_STA_GOT_IP:
+            if (mqtt_started == false) {
+                xTaskCreate((void (*)(void *))mqtt_main, "mqtt_example", 10240, NULL, 5, NULL);
+                mqtt_started = true;
+            }
+
+            break;
+
+        default:
+            break;
+    }
+
+    return ESP_OK;
+}
+
+void app_iot_start(void)
+{
+
+    conn_mgr_init();
+    conn_mgr_register_wifi_event(wifi_event_handle);
+    conn_mgr_set_wifi_config_ext((const uint8_t *)"TP-LINK_5487", strlen("TP-LINK_5487"), (const uint8_t *)"6302ABCD!", strlen("6302ABCD!"));
+
+    IOT_SetLogLevel(IOT_LOG_INFO);
+
+    conn_mgr_start();
+}
+#endif
 

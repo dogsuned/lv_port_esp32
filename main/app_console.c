@@ -18,6 +18,7 @@ typedef struct {
 } console_cmd_t;
 
 static esp_console_repl_t *s_repl = NULL;
+static char show_string[64] = {0};
 
 static int cmd_test(int argc, char **argv)
 {
@@ -53,10 +54,31 @@ static int cmd_mqtt_start(int argc, char **argv)
     return 0;
 }
 
+static int cmd_show_string(int argc, char **argv)
+{
+    if (argc < 2) {
+        ESP_LOGW(TAG, "argc = %d\n", argc);
+        return -1;
+    }
+
+    strcpy(show_string, argv[1]);
+    return 0;
+}
+
+char *console_get_string(void)
+{
+    if (strlen(show_string) <= 0) {
+        strcpy(show_string, "esp32 mqtt");
+    }
+
+    return show_string;
+}
+
 static console_cmd_t usr_cmd[] = {
     {"test",    cmd_test},
     {"wifi",    cmd_wifi_config},
     {"mqtt",    cmd_mqtt_start},
+    {"show",    cmd_show_string}
 };
 
 esp_err_t app_console_cmd_register(const char *cmd, esp_console_cmd_func_t cmd_func)
