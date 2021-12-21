@@ -22,6 +22,7 @@
 #include "nvs_flash.h"
 #include "app_console.h"
 #include "app_iot.h"
+#include "app_http_server.h"
 
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -32,6 +33,9 @@
 
 #include "lvgl_helpers.h"
 #include "lcd.h"
+#include "lv_examples.h"
+#include "eventhub.h"
+#include "app_http_server.h"
 
 #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
     #if defined CONFIG_LV_USE_DEMO_WIDGETS
@@ -60,6 +64,21 @@ static void lv_tick_task(void *arg);
 static void guiTask(void *pvParameter);
 static void create_demo_application(void);
 
+void event_handle(int event)
+{
+    printf("got event: 0x%x\n", event);
+    switch (event) {
+        case EVENTHUB_TYPE_NET_CONNECTED:
+            printf("ready start http server\n");
+            app_http_server_start();
+            break;
+
+        default:
+            printf("unrecorgnized event: 0x%x\n", event);
+            break;
+    }
+}
+
 /**********************
  *   APPLICATION MAIN
  **********************/
@@ -69,6 +88,9 @@ void app_main() {
         ESP_ERROR_CHECK( nvs_flash_erase() );
         ESP_ERROR_CHECK( nvs_flash_init() );
     }
+
+    eventhub_init();
+    eventhub_subscribe(event_handle);
 
     app_console_init();
 
@@ -168,7 +190,9 @@ static void guiTask(void *pvParameter) {
     ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
 
     /* Create the demo application */
-    create_demo_application();
+    // create_demo_application();
+    // lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xffffff), 0);
+    // my_gui();
 
     while (1) {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */

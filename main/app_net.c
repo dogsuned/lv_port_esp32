@@ -10,6 +10,7 @@
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
+#include "eventhub.h"
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
@@ -27,6 +28,8 @@ static int s_retry_num = 0;
 static void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
 {
+    tcpip_adapter_ip_info_t local_ip;
+
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
@@ -43,6 +46,13 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+
+        tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &local_ip);
+        printf("self:"IPSTR"\n",IP2STR(&local_ip.ip));
+        printf("self:"IPSTR"\n",IP2STR(&local_ip.netmask));
+        printf("self:"IPSTR"\n",IP2STR(&local_ip.gw));
+        eventhub_publish(EVENTHUB_TYPE_NET_CONNECTED, 0);
+        // app_http_server_start();
     }
 }
 
