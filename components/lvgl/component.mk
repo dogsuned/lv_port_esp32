@@ -17,6 +17,7 @@ COMPONENT_SRCDIRS := . \
                   src/extra/themes/basic \
                   src/extra/themes/default \
                   src/extra/widgets/calendar \
+                  src/extra/widgets/animimg \
                   src/extra/widgets/colorwheel \
                   src/extra/widgets \
                   src/extra/widgets/imgbtn \
@@ -28,6 +29,8 @@ COMPONENT_SRCDIRS := . \
                   src/extra/widgets/spinner \
                   src/extra/widgets/tabview \
                   src/extra/widgets/tileview \
+                  src/extra/widgets/chart \
+                  src/extra/widgets/meter \
                   src/extra/widgets/win
 
 

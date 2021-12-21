@@ -8,7 +8,7 @@
 #include "app_net.h"
 #include "esp_log.h"
 #include "app_console.h"
-#include "app_iot.h"
+// #include "app_iot.h"
 
 static const char* TAG = "console";
 
@@ -50,7 +50,7 @@ static int cmd_wifi_config(int argc, char **argv)
 
 static int cmd_mqtt_start(int argc, char **argv)
 {
-    app_iot_start();
+    // app_iot_start();
     return 0;
 }
 
