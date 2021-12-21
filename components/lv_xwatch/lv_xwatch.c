@@ -1,4 +1,4 @@
-#include "lv_page.h"
+#include "pages/lv_page.h"
 #include "pages/lv_pages_include.h"
 
 static lv_page_t main_page = {

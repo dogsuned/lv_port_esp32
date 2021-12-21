@@ -1,7 +1,7 @@
 if(ESP_PLATFORM)
 
 file(GLOB SOURCES *.c ./assets/font/*.c ./assets/image/*.c ./pages/*.c)
-set(LVGL_INCLUDE_DIRS . ./assets/font/ ./assets/image/ ./pages/)
+set(LVGL_INCLUDE_DIRS .)
 
 idf_component_register(SRCS ${SOURCES}
                        INCLUDE_DIRS ${LVGL_INCLUDE_DIRS}
