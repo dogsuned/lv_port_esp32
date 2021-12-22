@@ -8,3 +8,6 @@
 [submodule "components/lvgl"]
 	path = components/lvgl
 	url = https://github.com/lvgl/lvgl.git
+[submodule "components/esp-aliyun"]
+	path = components/esp-aliyun
+	url = git@github.com:espressif/esp-aliyun.git
